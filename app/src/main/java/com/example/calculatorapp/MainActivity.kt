@@ -3,133 +3,109 @@ package com.example.calculatorapp
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import net.objecthunter.exp4j.ExpressionBuilder
 
 
 class MainActivity : AppCompatActivity() {
 
-    private var canAddOperation = false
-    private var canAddDecimal = true
+    // TextView used to display the input and output
+    lateinit var txtInput: TextView
+
+    // Represent whether the lastly pressed key is numeric or not
+    var lastNumeric: Boolean = false
+
+    // Represent that current state is in error or not
+    var stateError: Boolean = false
+
+    // If true, do not allow to add another DOT
+    var lastDot: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        txtInput = findViewById(R.id.workingsTv)
     }
 
-    fun numberAction(view: View) {
-        if (view is Button) {
-            if (view.text == ".") {
-                if (canAddDecimal) workingsTv.append(view.text)
-                canAddDecimal = false
-            } else {
-                workingsTv.append(view.text)
-                canAddOperation = true
-            }
+    /**
+     * Append the Button.text to the TextView
+     */
+    fun onDigit(view: View) {
+        if (stateError) {
+            // If current state is Error, replace the error message
+            txtInput.text = (view as Button).text
+            stateError = false
+        } else {
+            // If not, already there is a valid expression so append to it
+            txtInput.append((view as Button).text)
+        }
+        // Set the flag
+        lastNumeric = true
+    }
+
+    /**
+     * Append . to the TextView
+     */
+    fun onDecimalPoint(view: View) {
+        if (lastNumeric && !stateError && !lastDot) {
+            txtInput.append(".")
+            lastNumeric = false
+            lastDot = true
         }
     }
-    fun operationAction(view: View) {
-        if (view is Button && canAddOperation) {
-            workingsTv.append(view.text)
-            canAddOperation = false
-            canAddDecimal = true
+
+    /**
+     * Append +,-,*,/ operators to the TextView
+     */
+    fun onOperator(view: View) {
+        if (lastNumeric && !stateError) {
+            txtInput.append((view as Button).text)
+            lastNumeric = false
+            lastDot = false    // Reset the DOT flag
         }
     }
 
-    fun allClearAction(view: View) {
-        workingsTv.text = ""
-        resultsTv.text = ""
+
+    /**
+     * Clear the TextView
+     */
+    fun onClear(view: View) {
+        this.txtInput.text = ""
+        lastNumeric = false
+        stateError = false
+        lastDot = false
     }
 
-    fun backSpaceAction(view: View) {
-        val length = workingsTv.length()
+    fun backSpace(view: View) {
+        val length = txtInput.length()
         if (length > 0) {
-            workingsTv.text = workingsTv.text.subSequence(0, length - 1)
+            txtInput.text = txtInput.text.subSequence(0, length - 1)
         }
     }
-    fun equalsAction(view: View) {
-        resultsTv.text = calculateResults()
-    }
 
-    private fun calculateResults(): String {
-        val digitOperators = digitsOperators()
-        if (digitOperators.isEmpty()) return ""
-        
-        val timesDivision = timesDivisionCalculate(digitOperators)
-        if (timesDivision.isEmpty()) return ""
-
-        val result = addSubtractCalculate(timesDivision)
-        return result.toString()
-    }
-
-    private fun addSubtractCalculate(passedList: MutableList<Any>): Float {
-        var result = passedList[0] as Float
-
-        for (i in passedList.indices) {
-            if (passedList[i] is Char && i != passedList.lastIndex) {
-                val operator = passedList[i]
-                val nextDigit = passedList[i + 1] as Float
-                if (operator == '+') result += nextDigit
-                if (operator == '-') result -= nextDigit
+    /**
+     * Calculate the output using Exp4j
+     */
+    fun onEqual(view: View) {
+        // If the current state is error, nothing to do.
+        // If the last input is a number only, solution can be found.
+        if (lastNumeric && !stateError) {
+            // Read the expression
+            val txt = txtInput.text.toString()
+            // Create an Expression (A class from exp4j library)
+            val expression = ExpressionBuilder(txt).build()
+            try {
+                // Calculate the result and display
+                val result = expression.evaluate()
+                txtInput.text = result.toString()
+                lastDot = true // Result contains a dot
+            } catch (ex: ArithmeticException) {
+                // Display an error message
+                txtInput.text = "Error"
+                stateError = true
+                lastNumeric = false
             }
         }
-        return result
-    }
-
-    private fun timesDivisionCalculate(passedList: MutableList<Any>): MutableList<Any> {
-        var list = passedList
-        while (list.contains('x') || list.contains('/')) {
-            list = calcTimesDiv(list)
-        }
-        return list
-    }
-
-    private fun calcTimesDiv(passedList: MutableList<Any>): MutableList<Any> {
-        val newList = mutableListOf<Any>()
-        var restartIndex = passedList.size
-
-        for (i in passedList.indices) {
-            if (passedList[i] is Char && i != passedList.lastIndex && i < restartIndex) {
-                val operator = passedList[i]
-                val prevDigit = passedList[i - 1] as Float
-                val nextDigit = passedList[i + 1] as Float
-                when(operator) {
-                    'x' -> {
-                        newList.add(prevDigit * nextDigit)
-                        restartIndex = i + 1
-                    }
-                    '/' -> {
-                        newList.add(prevDigit / nextDigit)
-                        restartIndex = i + 1
-                    }
-                    else -> {
-                        newList.add(prevDigit)
-                        newList.add(operator)
-                    }
-                }
-            }
-            if (i > restartIndex) {
-                newList.add(passedList[i])
-            }
-        }
-
-        return newList
-    }
-
-    private fun digitsOperators(): MutableList<Any>{
-        val list = mutableListOf<Any>()
-        var currentDigit = ""
-        for (character in workingsTv.text) {
-            if (character.isDigit() || character == '.') {
-                currentDigit += character
-            } else {
-                list.add(currentDigit.toFloat())
-                currentDigit = ""
-                list.add(character)
-            }
-        }
-        if (currentDigit != "") list.add(currentDigit.toFloat())
-
-        return list
     }
 }

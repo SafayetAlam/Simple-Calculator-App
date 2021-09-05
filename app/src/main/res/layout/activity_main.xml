@@ -19,32 +19,16 @@
         <TextView
             android:id="@+id/workingsTv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text=""
             android:lines="2"
             android:maxLines="2"
             android:textColor="@color/white"
             android:textAlignment="textEnd"
-            android:textSize="25sp"
-            app:layout_constraintBottom_toTopOf="@id/resultsTv"
+            android:textSize="60sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/resultsTv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:lines="1"
-            android:maxLines="1"
-            android:textColor="@color/white"
-            android:textAlignment="textEnd"
-            android:textSize="40sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -54,23 +38,21 @@
         <Button
             style="@style/buttonNumber"
             android:text="AC"
+            android:layout_weight="1.5"
             android:textColor="@color/red"
-            android:onClick="allClearAction"/>
+            android:onClick="onClear"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="⌫"
+            android:layout_weight="1.5"
             android:textColor="@color/red"
-            android:onClick="backSpaceAction"/>
-
-        <Button
-            style="@style/buttonNumber"
-            android:text=""/>
+            android:onClick="backSpace"/>
 
         <Button
             style="@style/buttonOperator"
             android:text="/"
-            android:onClick="operationAction"/>
+            android:onClick="onOperator"/>
 
     </LinearLayout>
 
@@ -80,22 +62,22 @@
         <Button
             style="@style/buttonNumber"
             android:text="7"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="8"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="9"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonOperator"
             android:text="*"
-            android:onClick="operationAction"/>
+            android:onClick="onOperator"/>
 
     </LinearLayout>
 
@@ -105,22 +87,22 @@
         <Button
             style="@style/buttonNumber"
             android:text="4"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="5"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="6"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonOperator"
             android:text="-"
-            android:onClick="operationAction"/>
+            android:onClick="onOperator"/>
 
     </LinearLayout>
 
@@ -130,22 +112,22 @@
         <Button
             style="@style/buttonNumber"
             android:text="1"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="2"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="3"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonOperator"
             android:text="+"
-            android:onClick="operationAction"/>
+            android:onClick="onOperator"/>
 
     </LinearLayout>
 
@@ -155,19 +137,19 @@
         <Button
             style="@style/buttonNumber"
             android:text="."
-            android:onClick="numberAction"/>
+            android:onClick="onDecimalPoint"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="0"
-            android:onClick="numberAction"/>
+            android:onClick="onDigit"/>
 
         <Button
             style="@style/buttonNumber"
             android:text="="
             android:layout_weight="2"
             android:textSize="40sp"
-            android:onClick="equalsAction"
+            android:onClick="onEqual"
             android:background="@color/orange"/>
 
 
